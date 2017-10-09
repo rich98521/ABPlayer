@@ -1,0 +1,12 @@
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\bin\Debug\ABPlayer.exe.config
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\bin\Debug\ABPlayer.exe
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\bin\Debug\ABPlayer.pdb
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.csprojResolveAssemblyReference.cache
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.Properties.Resources.resources
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.csproj.GenerateResource.Cache
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.exe
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.pdb
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\bin\Debug\Bass.Net.xml
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.Form1.resources
+c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\Debug\ABPlayer.Scrubber.resources
+C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\bin\Debug\taglib-sharp.dll
