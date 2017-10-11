@@ -11,3 +11,4 @@ C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86
 C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Release\ABPlayer.csproj.GenerateResource.Cache
 C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Release\ABPlayer.exe
 C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Release\ABPlayer.pdb
+C:\Users\Richard\Documents\Visual Studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Release\ABPlayer.JumpToForm.resources

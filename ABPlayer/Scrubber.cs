@@ -154,10 +154,13 @@ namespace ABPlayer
             base.OnMouseDown(e);
             if (e.Button == MouseButtons.Left)
             {
-                mLDown = true;
-                Scrub(e.Location);
-                downX = e.X;
-                this.Invalidate();
+                if (scrubRec.Contains(e.Location))
+                {
+                    mLDown = true;
+                    Scrub(e.Location);
+                    downX = e.X;
+                    this.Invalidate();
+                }
             }
         }
 

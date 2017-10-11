@@ -70,7 +70,7 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.chkArtPlaying = new System.Windows.Forms.CheckBox();
             this.pBoxArt = new System.Windows.Forms.PictureBox();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.pnlScrubControl = new System.Windows.Forms.Panel();
             this.pnlPlayerControls = new System.Windows.Forms.Panel();
             this.btnPrev = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -78,20 +78,24 @@
             this.lblVol = new System.Windows.Forms.Label();
             this.btnPausePlay = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
+            this.showToolbarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileList = new ABPlayer.ABListView();
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.scrubber1 = new ABPlayer.Scrubber();
+            this.scrubber = new ABPlayer.Scrubber();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.dockAtTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.alwaysOnTopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pBoxArt)).BeginInit();
-            this.panel1.SuspendLayout();
+            this.pnlScrubControl.SuspendLayout();
             this.pnlPlayerControls.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tBarVol)).BeginInit();
@@ -110,6 +114,7 @@
             this.menuStrip1.Size = new System.Drawing.Size(930, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -178,7 +183,7 @@
             this.toolStripMenuItem1.CheckOnClick = true;
             this.toolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.toolStripMenuItem1.Text = "Stereo";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
@@ -186,7 +191,7 @@
             // 
             this.monoToolStripMenuItem.CheckOnClick = true;
             this.monoToolStripMenuItem.Name = "monoToolStripMenuItem";
-            this.monoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.monoToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.monoToolStripMenuItem.Text = "Mono";
             this.monoToolStripMenuItem.Click += new System.EventHandler(this.monoToolStripMenuItem_Click);
             // 
@@ -346,7 +351,7 @@
             // preferencesToolStripMenuItem
             // 
             this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.preferencesToolStripMenuItem.Text = "Preferences";
             // 
             // viewToolStripMenuItem
@@ -355,9 +360,13 @@
             this.showArtToolStripMenuItem,
             this.showFilesToolStripMenuItem,
             this.showControlsToolStripMenuItem,
+            this.showToolbarToolStripMenuItem,
             this.toolStripSeparator3,
             this.hideAllToolStripMenuItem,
-            this.showAllToolStripMenuItem});
+            this.showAllToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.dockAtTopToolStripMenuItem,
+            this.alwaysOnTopToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
@@ -368,7 +377,7 @@
             this.showArtToolStripMenuItem.CheckOnClick = true;
             this.showArtToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showArtToolStripMenuItem.Name = "showArtToolStripMenuItem";
-            this.showArtToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.showArtToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.showArtToolStripMenuItem.Text = "Show Art";
             this.showArtToolStripMenuItem.Click += new System.EventHandler(this.showArtToolStripMenuItem_Click);
             // 
@@ -378,7 +387,7 @@
             this.showFilesToolStripMenuItem.CheckOnClick = true;
             this.showFilesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showFilesToolStripMenuItem.Name = "showFilesToolStripMenuItem";
-            this.showFilesToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.showFilesToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.showFilesToolStripMenuItem.Text = "Show Files";
             this.showFilesToolStripMenuItem.Click += new System.EventHandler(this.showFilesToolStripMenuItem_Click);
             // 
@@ -388,26 +397,26 @@
             this.showControlsToolStripMenuItem.CheckOnClick = true;
             this.showControlsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showControlsToolStripMenuItem.Name = "showControlsToolStripMenuItem";
-            this.showControlsToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.showControlsToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.showControlsToolStripMenuItem.Text = "Show Controls";
             this.showControlsToolStripMenuItem.Click += new System.EventHandler(this.showControlsToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(148, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(184, 6);
             // 
             // hideAllToolStripMenuItem
             // 
             this.hideAllToolStripMenuItem.Name = "hideAllToolStripMenuItem";
-            this.hideAllToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.hideAllToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.hideAllToolStripMenuItem.Text = "Hide All";
             this.hideAllToolStripMenuItem.Click += new System.EventHandler(this.hideAllToolStripMenuItem_Click);
             // 
             // showAllToolStripMenuItem
             // 
             this.showAllToolStripMenuItem.Name = "showAllToolStripMenuItem";
-            this.showAllToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.showAllToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.showAllToolStripMenuItem.Text = "Show All";
             this.showAllToolStripMenuItem.Click += new System.EventHandler(this.showAllToolStripMenuItem_Click);
             // 
@@ -475,15 +484,15 @@
             this.pBoxArt.MouseEnter += new System.EventHandler(this.pBoxArt_MouseEnter);
             this.pBoxArt.MouseLeave += new System.EventHandler(this.pBoxArt_MouseLeave);
             // 
-            // panel1
+            // pnlScrubControl
             // 
-            this.panel1.Controls.Add(this.scrubber1);
-            this.panel1.Controls.Add(this.pnlPlayerControls);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 268);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(930, 48);
-            this.panel1.TabIndex = 1;
+            this.pnlScrubControl.Controls.Add(this.scrubber);
+            this.pnlScrubControl.Controls.Add(this.pnlPlayerControls);
+            this.pnlScrubControl.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlScrubControl.Location = new System.Drawing.Point(0, 268);
+            this.pnlScrubControl.Name = "pnlScrubControl";
+            this.pnlScrubControl.Size = new System.Drawing.Size(930, 48);
+            this.pnlScrubControl.TabIndex = 1;
             // 
             // pnlPlayerControls
             // 
@@ -557,6 +566,18 @@
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
+            // showToolbarToolStripMenuItem
+            // 
+            this.showToolbarToolStripMenuItem.Checked = true;
+            this.showToolbarToolStripMenuItem.CheckOnClick = true;
+            this.showToolbarToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showToolbarToolStripMenuItem.Name = "showToolbarToolStripMenuItem";
+            this.showToolbarToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+T";
+            this.showToolbarToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.showToolbarToolStripMenuItem.Text = "Show Toolbar";
+            this.showToolbarToolStripMenuItem.ToolTipText = "Ctrl+T to toggle";
+            this.showToolbarToolStripMenuItem.Click += new System.EventHandler(this.showToolbarToolStripMenuItem_Click);
+            // 
             // fileList
             // 
             this.fileList.AllowColumnReorder = true;
@@ -609,20 +630,42 @@
             this.columnHeader10.Text = "Location";
             this.columnHeader10.Width = 292;
             // 
-            // scrubber1
+            // scrubber
             // 
-            this.scrubber1.CurrentTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.CurrentTotalTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scrubber1.FileStartTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.FileTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.Location = new System.Drawing.Point(268, 0);
-            this.scrubber1.Name = "scrubber1";
-            this.scrubber1.Size = new System.Drawing.Size(662, 48);
-            this.scrubber1.TabIndex = 5;
-            this.scrubber1.TotalTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseDown);
-            this.scrubber1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseUp);
+            this.scrubber.CurrentTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber.CurrentTotalTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scrubber.FileStartTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber.FileTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber.Location = new System.Drawing.Point(268, 0);
+            this.scrubber.Name = "scrubber";
+            this.scrubber.Size = new System.Drawing.Size(662, 48);
+            this.scrubber.TabIndex = 5;
+            this.scrubber.TotalTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber.Load += new System.EventHandler(this.scrubber_Load);
+            this.scrubber.DoubleClick += new System.EventHandler(this.scrubber_DoubleClick);
+            this.scrubber.MouseDown += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseDown);
+            this.scrubber.MouseUp += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseUp);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(184, 6);
+            // 
+            // dockAtTopToolStripMenuItem
+            // 
+            this.dockAtTopToolStripMenuItem.Name = "dockAtTopToolStripMenuItem";
+            this.dockAtTopToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.dockAtTopToolStripMenuItem.Text = "Dock At Top";
+            this.dockAtTopToolStripMenuItem.Click += new System.EventHandler(this.dockAtTopToolStripMenuItem_Click);
+            // 
+            // alwaysOnTopToolStripMenuItem
+            // 
+            this.alwaysOnTopToolStripMenuItem.CheckOnClick = true;
+            this.alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
+            this.alwaysOnTopToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.alwaysOnTopToolStripMenuItem.Text = "Always On Top";
+            this.alwaysOnTopToolStripMenuItem.Click += new System.EventHandler(this.alwaysOnTopToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -630,12 +673,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(930, 316);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.pnlScrubControl);
             this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "ABPlayer";
+            this.MaximizedBoundsChanged += new System.EventHandler(this.Form1_MaximizedBoundsChanged);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.menuStrip1.ResumeLayout(false);
@@ -646,7 +690,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pBoxArt)).EndInit();
-            this.panel1.ResumeLayout(false);
+            this.pnlScrubControl.ResumeLayout(false);
             this.pnlPlayerControls.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -681,14 +725,14 @@
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ColumnHeader columnHeader9;
         private System.Windows.Forms.ColumnHeader columnHeader10;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel pnlScrubControl;
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.Button btnPausePlay;
         private System.Windows.Forms.Button btnPrev;
         private System.Windows.Forms.TrackBar tBarVol;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label lblVol;
-        private Scrubber scrubber1;
+        private Scrubber scrubber;
         private System.Windows.Forms.Panel pnlPlayerControls;
         private System.Windows.Forms.ToolStripMenuItem speedToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
@@ -715,6 +759,10 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem showToolbarToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem dockAtTopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem alwaysOnTopToolStripMenuItem;
     }
 }
 

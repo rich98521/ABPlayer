@@ -20,6 +20,8 @@ namespace ABPlayer
         List<AudioFile> audioFiles = new List<AudioFile>();
         int UID = 0, playingId;
         AudioFile playing;
+        const int SC_MAXIMIZE = 0xF030, SC_RESTORE = 0xF120, SC_MINIMIZE = 0XF020;
+        int lastWindowState = SC_RESTORE;
         //add bookmode to listview, show one entry per books(albums), playing a different book will start from your last position in that book - so you can play other files/books and come back
         //playing a file directly always plays from the start assuming its not loaded/prescrubbed
         //make it a whole other mode, book scrubber by default (also make book scrubber only for current book not for entire library)
@@ -29,7 +31,7 @@ namespace ABPlayer
         {
             InitializeComponent();
             chkArtPlaying.Parent = pBoxArt;
-            scrubber1.Scrubbed += Scrubber1_Scrubbed;
+            scrubber.Scrubbed += Scrubber1_Scrubbed;
             fileList.OrderChanged += fileList_OrderChanged;
             AudioPlayer.AudioPlaying += AudioPlayer_AudioPlaying;
             AudioPlayer.AudioCompleted += AudioPlayer_AudioCompleted;
@@ -73,6 +75,20 @@ namespace ABPlayer
                         }
                     }
                 }
+                file = Path.Combine(folder, "settings.txt");
+                if (File.Exists(file))
+                {
+                    using (FileStream fs = new FileStream(file, FileMode.Open))
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        AudioPlayer.Volume = Convert.ToSingle(sr.ReadLine());
+                        UpdateMono(Convert.ToBoolean(sr.ReadLine()));
+                        AudioPlayer.Speed = Convert.ToSingle(sr.ReadLine());
+                    }
+                }
+                tBarVol.Value = (int)(AudioPlayer.Volume * 100);
+                lblVol.Text = tBarVol.Value + "%";
+                speedToolStripMenuItem.Text = "Speed (" + AudioPlayer.Speed + ")";
             }
         }
 
@@ -84,34 +100,47 @@ namespace ABPlayer
             else
             {
                 AudioPlayer.Stop();
-                scrubber1.Reset();
+                scrubber.Reset();
             }
         }
 
         private void AudioPlayer_AudioPlaying(TimeSpan currentTime)
         {
-            scrubber1.SetCurrentTotal(scrubber1.FileStartTime + currentTime);
-            scrubber1.Refresh();
+            scrubber.SetCurrentTotal(scrubber.FileStartTime + currentTime);
+            scrubber.Refresh();
         }
 
         private void fileList_OrderChanged(object sender)
         {
+            audioFiles = (from ListViewItem i in fileList.Items
+                          join o in audioFiles
+                          on (int)i.Tag equals o.UID
+                          select o).ToList();
+            bool removedPlaying = playing != null && !audioFiles.Contains(playing);
             if (audioFiles.Count > 0)
             {
-                audioFiles = (from ListViewItem i in fileList.Items
-                              join o in audioFiles
-                              on (int)i.Tag equals o.UID
-                              select o).ToList();
-
                 audioFiles[0].StartTime = new TimeSpan();
                 for (int i = 1; i < audioFiles.Count; i++)
                 {
-                    audioFiles[i].StartTime = audioFiles[i - 1].StartTime += audioFiles[i - 1].Duration;
+                    audioFiles[i].StartTime = audioFiles[i - 1].StartTime + audioFiles[i - 1].Duration;
                 }
-                scrubber1.FileStartTime = playing.StartTime;
-                scrubber1.TotalTime = audioFiles.Last().EndTime;
-                scrubber1.Refresh();
+                if (playing != null)
+                    scrubber.FileStartTime = playing.StartTime;
+                scrubber.TotalTime = audioFiles.Last().EndTime;
             }
+            else
+            {
+                scrubber.TotalTime = new TimeSpan();
+            }
+            if(removedPlaying)
+            {
+                playing = null;
+                playingId = -1;
+                AudioPlayer.Stop();
+                scrubber.Reset();
+                pBoxArt.Image = null;
+            }
+            scrubber.Refresh();
         }
 
         private void Scrubber1_Scrubbed(object sender, TimeSpan newTime)
@@ -141,14 +170,14 @@ namespace ABPlayer
                 }
             }
             else
-                AudioPlayer.JumpTo(scrubber1.CurrentTime);
+                AudioPlayer.JumpTo(scrubber.CurrentTime);
         }
 
         private void UpdateScrubber(int index, TimeSpan current, TimeSpan startTime)
         {
-            scrubber1.FileTime = audioFiles[index].Duration;
-            scrubber1.CurrentTime = current;
-            scrubber1.FileStartTime = startTime;
+            scrubber.FileTime = audioFiles[index].Duration;
+            scrubber.CurrentTime = current;
+            scrubber.FileStartTime = startTime;
         }
 
         private void AddFiles(string[] files)
@@ -166,7 +195,7 @@ namespace ABPlayer
                     audioFiles.Add(new AudioFile() { UID = uid, Tags = tags, Duration = playingLength, Location = f, StartTime = startTime });
                     startTime += audioFiles.Last().Duration;
 
-                    scrubber1.TotalTime += playingLength;
+                    scrubber.TotalTime += playingLength;
 
                     fileList.Items.Add(new ListViewItem(new string[] { tags.Track + "", tags.Title == null ? System.IO.Path.GetFileName(f) : tags.Title, playingLength.ToString(@"hh\:mm\:ss"), tags.Album, f }) { Name = ""+(uid), Tag = uid });
                 }
@@ -233,14 +262,24 @@ namespace ABPlayer
             UpdateVisible();
         }
 
+        private void showToolbarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UpdateVisible();
+        }
+
         private void UpdateVisible()
         {
+            Size newMax = MaximumSize;
+            Size newMin = MinimumSize;
             if (!splitContainer1.Visible)
             {
-                MaximumSize = new Size(0, 0);
+                newMax = new Size();
+                newMin = new Size();
                 splitContainer1.Visible = true;
                 this.Height += (int)splitContainer1.Tag;
             }
+            pnlPlayerControls.Visible = showControlsToolStripMenuItem.Checked;
+            menuStrip1.Visible = showToolbarToolStripMenuItem.Checked;
             if (showArtToolStripMenuItem.Checked && showFilesToolStripMenuItem.Checked)
             {
                 splitContainer1.Panel2Collapsed = false;
@@ -266,9 +305,11 @@ namespace ABPlayer
             {
                 splitContainer1.Tag = splitContainer1.Height;
                 splitContainer1.Visible = false;
-                MaximumSize = new Size(5000, 111);
+                newMax = new Size(5000, pnlScrubControl.Height + (menuStrip1.Visible ? menuStrip1.Height : 0) + (this.Height - ClientSize.Height));
+                newMin = new Size(0, pnlScrubControl.Height + (menuStrip1.Visible ? menuStrip1.Height : 0) + (this.Height - ClientSize.Height));
             }
-            pnlPlayerControls.Visible = showControlsToolStripMenuItem.Checked;
+            MaximumSize = newMax;
+            //MinimumSize = newMin;
         }
 
         private void showControlsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -278,81 +319,118 @@ namespace ABPlayer
 
         private void hideAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showArtToolStripMenuItem.Checked = false;
-            showFilesToolStripMenuItem.Checked = false;
-            showControlsToolStripMenuItem.Checked = false;
-            UpdateVisible();
+            SetAllVisible(false);
         }
 
         private void showAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showArtToolStripMenuItem.Checked = true;
-            showFilesToolStripMenuItem.Checked = true;
-            showControlsToolStripMenuItem.Checked = true;
+            SetAllVisible(true);
+        }
+
+        private void SetAllVisible(bool b)
+        {
+            showArtToolStripMenuItem.Checked = b;
+            showFilesToolStripMenuItem.Checked = b;
+            showControlsToolStripMenuItem.Checked = b;
+            //showToolbarToolStripMenuItem.Checked = true;
             UpdateVisible();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Right)
-                secondsToolStripMenuItem.PerformClick();
+                Jump(new TimeSpan(0, 0, 10), true);
             else if (keyData == (Keys.Right | Keys.Shift))
-                minuteToolStripMenuItem.PerformClick();
+                Jump(new TimeSpan(0, 1, 0), true);
             else if (keyData == Keys.Left)
-                secondsToolStripMenuItem2.PerformClick();
+                Jump(new TimeSpan(0, 0, -10), true);
             else if (keyData == (Keys.Left | Keys.Shift))
-                minuteToolStripMenuItem1.PerformClick();
+                Jump(new TimeSpan(0, -1, 0), true);
+            else if (keyData == (Keys.Control | Keys.T))
+            { 
+                showToolbarToolStripMenuItem.Checked = !showToolbarToolStripMenuItem.Checked;
+                UpdateVisible();
+            }
+            else if (keyData == Keys.Space)
+                PlayPause();
             else
                 return base.ProcessCmdKey(ref msg, keyData);
+
+
             return true;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            int wParam = (m.WParam.ToInt32() & 0xFFF0);
+            if (wParam == SC_MAXIMIZE)
+            {
+                if (lastWindowState == SC_RESTORE &&
+                    showArtToolStripMenuItem.Checked == false &&
+                    showFilesToolStripMenuItem.Checked == false &&
+                    showControlsToolStripMenuItem.Checked == false &&
+                    showToolbarToolStripMenuItem.Checked == false)
+                {
+                    FormBorderStyle = FormBorderStyle.None;
+                    UpdateVisible();
+                }
+                lastWindowState = wParam;
+            }
+            else if (wParam == SC_RESTORE)
+            {
+                lastWindowState = wParam;
+            }
+            else if (wParam == SC_MINIMIZE)
+            {
+                lastWindowState = wParam;
+            }
+            base.WndProc(ref m);
+        }
+
+        private void Jump(TimeSpan t, bool offset)
+        {
+            scrubber.Jump(t, offset);
+            AudioPlayer.JumpTo(scrubber.CurrentTime);
         }
 
         private void secondsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 0, 10), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 0, 10), true);
         }
 
         private void secondsToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 0, 30), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 0, 30), true);
         }
 
         private void minuteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 1, 0), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 1, 0), true);
         }
 
         private void minutesToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 5, 0), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 5, 0), true);
         }
 
         private void secondsToolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 0, -10), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 0, -10), true);
         }
 
         private void secondsToolStripMenuItem3_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, 0, -30), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, 0, -30), true);
         }
 
         private void minuteToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, -1, 0), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, -1, 0), true);
         }
 
         private void minutesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            scrubber1.Jump(new TimeSpan(0, -5, 0), true);
-            AudioPlayer.JumpTo(scrubber1.CurrentTime);
+            Jump(new TimeSpan(0, -5, 0), true);
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -426,7 +504,7 @@ namespace ABPlayer
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AudioPlayer.Speed = 1;
-            speedToolStripMenuItem.Text = "Speed (" + AudioPlayer.Speed +")";
+            speedToolStripMenuItem.Text = "Speed (" + AudioPlayer.Speed + ")";
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -455,6 +533,11 @@ namespace ABPlayer
 
         private void btnPlayPause_Click(object sender, EventArgs e)
         {
+            PlayPause();
+        }
+
+        private void PlayPause()
+        {
             if (AudioPlayer.Playing)
             {
                 AudioPlayer.Pause();
@@ -479,14 +562,19 @@ namespace ABPlayer
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
             using (FileStream fs = new FileStream(Path.Combine(folder, "lastOpen.txt"), FileMode.Create))
+            using (StreamWriter sw = new StreamWriter(fs))
             {
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    sw.WriteLine(audioFiles.IndexOf(playing));
-                    sw.WriteLine(scrubber1.CurrentTotalTime.Ticks);
-                    foreach(AudioFile af in audioFiles)
-                        sw.WriteLine(af.Location);
-                }
+                sw.WriteLine(audioFiles.IndexOf(playing));
+                sw.WriteLine(scrubber.CurrentTotalTime.Ticks);
+                foreach (AudioFile af in audioFiles)
+                    sw.WriteLine(af.Location);
+            }
+            using (FileStream fs = new FileStream(Path.Combine(folder, "settings.txt"), FileMode.Create))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine(AudioPlayer.Volume);
+                sw.WriteLine(AudioPlayer.Mono);
+                sw.WriteLine(AudioPlayer.Speed);
             }
         }
 
@@ -541,21 +629,72 @@ namespace ABPlayer
             JumpToForm jtf = new JumpToForm();
             if(jtf.ShowDialog() == DialogResult.OK)
             {
-                scrubber1.Jump(playing.StartTime + jtf.Time, false);
+                scrubber.Jump(playing.StartTime + jtf.Time, false);
                 AudioPlayer.JumpTo(jtf.Time);
                 //scrubber1.Refresh();
             }
+        }
+
+        private void scrubber_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void scrubber_DoubleClick(object sender, EventArgs e)
+        {
+            if (lastWindowState == SC_MAXIMIZE)
+            {
+                WindowState = FormWindowState.Normal;
+                lastWindowState = SC_RESTORE;
+                showToolbarToolStripMenuItem.Checked = true;
+            }
+            ToggleBorder();
+            UpdateVisible();
+        }
+
+        private void ToggleBorder()
+        {
+            if (FormBorderStyle == FormBorderStyle.Sizable)
+                FormBorderStyle = FormBorderStyle.None;
+            else
+                FormBorderStyle = FormBorderStyle.Sizable;
+            UpdateVisible();
+        }
+
+        private void alwaysOnTopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TopMost = alwaysOnTopToolStripMenuItem.Checked;
+        }
+
+        private void dockAtTopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showToolbarToolStripMenuItem.Checked = false;
+            FormBorderStyle = FormBorderStyle.None;
+            SetAllVisible(false);
+            WindowState = FormWindowState.Maximized;
+            lastWindowState = SC_MAXIMIZE;
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void Form1_MaximizedBoundsChanged(object sender, EventArgs e)
+        {
+
         }
 
         private void PlayFile(int index, TimeSpan start, bool loadOnly)
         {
             playingId = audioFiles[index].UID;
             playing = audioFiles[index];
-            scrubber1.CurrentTime = start;
-            scrubber1.FileStartTime = audioFiles[index].StartTime;
-            scrubber1.FileTime = audioFiles[index].Duration;
-            scrubber1.Refresh();
+            scrubber.CurrentTime = start;
+            scrubber.FileStartTime = audioFiles[index].StartTime;
+            scrubber.FileTime = audioFiles[index].Duration;
+            scrubber.Refresh();
             fileList.PlayingID = playingId;
+            this.Text = fileList.Items["" + playing.UID].SubItems[1].Text;
             UpdateArtBox();
             fileList.Invalidate();
             if (start.TotalSeconds != 0)

@@ -42,7 +42,7 @@ namespace ABPlayer
             }
         }
 
-        protected virtual void OnScrubbed()
+        protected virtual void OnOrderChanged()
         {
             if (OrderChanged != null)
                 OrderChanged(this);
@@ -52,14 +52,30 @@ namespace ABPlayer
         {
             base.OnColumnClick(e);
             if (sortColumn == e.Column)
-            {
                 sortAsc = !sortAsc;
-            }
             else
                 sortAsc = false;
             sortColumn = e.Column;
-            this.ListViewItemSorter = Comparer<ListViewItem>.Create((x, y) => { return (x.SubItems[e.Column].Text[0] > y.SubItems[e.Column].Text[0]) == sortAsc ? -1 : 1; });
-            OnScrubbed();
+            this.ListViewItemSorter = Comparer<ListViewItem>.Create((x, y) => { return sortAsc ? -1 : 1; });
+            OnOrderChanged();
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            base.OnKeyUp(e);
+            if(e.KeyCode == Keys.Delete)
+            {
+                while (SelectedItems.Count > 0)
+                    Items.Remove(SelectedItems[0]);
+                
+                OnOrderChanged();
+            }
+            else if (e.KeyCode == Keys.A)
+            {
+                if (ModifierKeys == Keys.Control)
+                    foreach (ListViewItem it in Items)
+                        it.Selected = true;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -100,7 +116,7 @@ namespace ABPlayer
                         Items.Remove(item);
                         Items.Insert(dragIndex, item);
                     }
-                    OnScrubbed();
+                    OnOrderChanged();
                 }
                 else
                     this.Invalidate();
@@ -113,19 +129,22 @@ namespace ABPlayer
 
             if (m.Msg == WM_PAINT)
             {
-                Graphics g = Graphics.FromHwnd(this.Handle);
                 if (draggingItems)
                 {
                     ListViewItem it = GetItemAt(mPos.X, mPos.Y + 8);
+                    bool after = false;
+                    if ((after = mPos.Y + 8 > Items[Items.Count - 1].Bounds.Bottom))
+                        it = Items[Items.Count - 1];
                     if (it != null)
                     {
-                        dragIndex = it.Index;
+                        dragIndex = it.Index + (after ? 1 : 0);
                         drag = !(dragIndex > SelectedItems[0].Index - 1 && dragIndex < SelectedItems[SelectedItems.Count - 1].Index + 2) && dragIndex >= 0;
 
                         if (drag)
                         {
+                            Graphics g = Graphics.FromHwnd(this.Handle);
                             Rectangle pos = it.Bounds;
-                            g.DrawLine(new Pen(Color.Black), new Point(pos.X, pos.Y), new Point(pos.Width, pos.Y));
+                            g.DrawLine(new Pen(Color.Black), new Point(pos.X, pos.Y + (after ? it.Bounds.Height : 0)), new Point(pos.Width, pos.Y + (after ? it.Bounds.Height : 0)));
                         }
                     }
                 }
