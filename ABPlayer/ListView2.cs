@@ -9,7 +9,7 @@ using System.Drawing;
 namespace ABPlayer
 {
     public delegate void OrderChangedEventHandler(object sender);
-    class ListView2 : ListView
+    class ABListView : ListView
     {
         public event OrderChangedEventHandler OrderChanged;
         bool mLDown, draggingItems, drag, sortAsc;
@@ -17,7 +17,7 @@ namespace ABPlayer
         int dragIndex, sortColumn = -1;
         public int playingID;
         const int WM_PAINT = 0x0F;
-        public ListView2()
+        public ABListView()
         {
             DoubleBuffered = true;
         }

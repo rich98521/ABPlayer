@@ -10,3 +10,4 @@ c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86
 c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Debug\ABPlayer.exe
 c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Debug\ABPlayer.pdb
 c:\users\richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Debug\ABPlayer.csprojResolveAssemblyReference.cache
+C:\Users\Richard\documents\visual studio 2015\Projects\ABPlayer\ABPlayer\obj\x86\Debug\ABPlayer.JumpToForm.resources

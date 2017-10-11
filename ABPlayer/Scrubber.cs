@@ -36,6 +36,13 @@ namespace ABPlayer
             UpdateScrubRec();
         }
 
+        public void Reset()
+        {
+            CurrentTime = new TimeSpan();
+            currentTotalTime = new TimeSpan();
+            FileTime = new TimeSpan();
+        }
+
         protected virtual void OnScrubbed(TimeSpan t)
         {
             if (Scrubbed != null)
@@ -90,8 +97,26 @@ namespace ABPlayer
 
                 currentTotalTime = value;
                 currentTotalTime = new TimeSpan(Math.Max(Math.Min(currentTotalTime.Ticks, fileStartTime.Ticks + FileTime.Ticks), fileStartTime.Ticks));
-                OnScrubbed(newCurrentTime);
+                OnScrubbed(value);
             }
+        }
+
+        public void SetCurrentTotal(TimeSpan t)
+        {
+            TimeSpan newCurrentTime = CurrentTime + (t - currentTotalTime);
+            if (newCurrentTime > FileTime)
+            {
+                CurrentTime = FileTime;
+            }
+            else if (newCurrentTime.TotalSeconds < 0)
+            {
+                CurrentTime = new TimeSpan();
+            }
+            else
+            {
+                CurrentTime = newCurrentTime;
+            }
+            currentTotalTime = t;
         }
 
         private void UpdateScrubRec()

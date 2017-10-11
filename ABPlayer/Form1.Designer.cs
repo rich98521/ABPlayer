@@ -39,6 +39,11 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.monoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.speedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.jumpForwardsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.secondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,26 +70,21 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.chkArtPlaying = new System.Windows.Forms.CheckBox();
             this.pBoxArt = new System.Windows.Forms.PictureBox();
-            this.fileList = new ABPlayer.ListView2();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.pnlPlayerControls = new System.Windows.Forms.Panel();
+            this.btnPrev = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.tBarVol = new System.Windows.Forms.TrackBar();
+            this.lblVol = new System.Windows.Forms.Label();
+            this.btnPausePlay = new System.Windows.Forms.Button();
+            this.btnNext = new System.Windows.Forms.Button();
+            this.fileList = new ABPlayer.ABListView();
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.panel1 = new System.Windows.Forms.Panel();
             this.scrubber1 = new ABPlayer.Scrubber();
-            this.pnlPlayerControls = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.tBarVol = new System.Windows.Forms.TrackBar();
-            this.lblVol = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -178,15 +178,17 @@
             this.toolStripMenuItem1.CheckOnClick = true;
             this.toolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItem1.Text = "Stereo";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // monoToolStripMenuItem
             // 
             this.monoToolStripMenuItem.CheckOnClick = true;
             this.monoToolStripMenuItem.Name = "monoToolStripMenuItem";
-            this.monoToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.monoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.monoToolStripMenuItem.Text = "Mono";
+            this.monoToolStripMenuItem.Click += new System.EventHandler(this.monoToolStripMenuItem_Click);
             // 
             // speedToolStripMenuItem
             // 
@@ -199,6 +201,41 @@
             this.speedToolStripMenuItem.Name = "speedToolStripMenuItem";
             this.speedToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.speedToolStripMenuItem.Text = "Speed";
+            // 
+            // resetToolStripMenuItem
+            // 
+            this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.resetToolStripMenuItem.Text = "Reset";
+            this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(103, 22);
+            this.toolStripMenuItem3.Text = "+0.05";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(103, 22);
+            this.toolStripMenuItem4.Text = "+0.2";
+            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(103, 22);
+            this.toolStripMenuItem5.Text = "-0.05";
+            this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(103, 22);
+            this.toolStripMenuItem6.Text = "-0.2";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
             // toolStripSeparator2
             // 
@@ -296,6 +333,7 @@
             this.jumpToToolStripMenuItem.Name = "jumpToToolStripMenuItem";
             this.jumpToToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.jumpToToolStripMenuItem.Text = "Jump To";
+            this.jumpToToolStripMenuItem.Click += new System.EventHandler(this.jumpToToolStripMenuItem_Click);
             // 
             // toolsToolStripMenuItem
             // 
@@ -414,12 +452,15 @@
             // 
             this.chkArtPlaying.AutoSize = true;
             this.chkArtPlaying.BackColor = System.Drawing.Color.Transparent;
+            this.chkArtPlaying.Checked = true;
+            this.chkArtPlaying.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkArtPlaying.Location = new System.Drawing.Point(5, 4);
             this.chkArtPlaying.Name = "chkArtPlaying";
             this.chkArtPlaying.Size = new System.Drawing.Size(60, 17);
             this.chkArtPlaying.TabIndex = 1;
             this.chkArtPlaying.Text = "Playing";
             this.chkArtPlaying.UseVisualStyleBackColor = false;
+            this.chkArtPlaying.Visible = false;
             this.chkArtPlaying.CheckedChanged += new System.EventHandler(this.chkArtPlaying_CheckedChanged);
             // 
             // pBoxArt
@@ -434,56 +475,6 @@
             this.pBoxArt.MouseEnter += new System.EventHandler(this.pBoxArt_MouseEnter);
             this.pBoxArt.MouseLeave += new System.EventHandler(this.pBoxArt_MouseLeave);
             // 
-            // fileList
-            // 
-            this.fileList.AllowColumnReorder = true;
-            this.fileList.AllowDrop = true;
-            this.fileList.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.fileList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader6,
-            this.columnHeader7,
-            this.columnHeader8,
-            this.columnHeader9,
-            this.columnHeader10});
-            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileList.FullRowSelect = true;
-            this.fileList.HideSelection = false;
-            this.fileList.LabelWrap = false;
-            this.fileList.Location = new System.Drawing.Point(0, 0);
-            this.fileList.Name = "fileList";
-            this.fileList.Size = new System.Drawing.Size(678, 240);
-            this.fileList.TabIndex = 1;
-            this.fileList.UseCompatibleStateImageBehavior = false;
-            this.fileList.View = System.Windows.Forms.View.Details;
-            this.fileList.SelectedIndexChanged += new System.EventHandler(this.fileList_SelectedIndexChanged);
-            this.fileList.DragDrop += new System.Windows.Forms.DragEventHandler(this.fileList_DragDrop);
-            this.fileList.DragEnter += new System.Windows.Forms.DragEventHandler(this.fileList_DragEnter);
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Text = "#";
-            this.columnHeader6.Width = 34;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Title";
-            this.columnHeader7.Width = 232;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "Duration";
-            this.columnHeader8.Width = 54;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "Book";
-            this.columnHeader9.Width = 220;
-            // 
-            // columnHeader10
-            // 
-            this.columnHeader10.Text = "Location";
-            this.columnHeader10.Width = 292;
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.scrubber1);
@@ -494,40 +485,27 @@
             this.panel1.Size = new System.Drawing.Size(930, 48);
             this.panel1.TabIndex = 1;
             // 
-            // scrubber1
-            // 
-            this.scrubber1.CurrentTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scrubber1.FileStartTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.FileTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.Location = new System.Drawing.Point(268, 0);
-            this.scrubber1.Name = "scrubber1";
-            this.scrubber1.Size = new System.Drawing.Size(662, 48);
-            this.scrubber1.TabIndex = 5;
-            this.scrubber1.TotalTime = System.TimeSpan.Parse("00:00:00");
-            this.scrubber1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseDown);
-            this.scrubber1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseUp);
-            // 
             // pnlPlayerControls
             // 
-            this.pnlPlayerControls.Controls.Add(this.button1);
+            this.pnlPlayerControls.Controls.Add(this.btnPrev);
             this.pnlPlayerControls.Controls.Add(this.panel2);
-            this.pnlPlayerControls.Controls.Add(this.button2);
-            this.pnlPlayerControls.Controls.Add(this.button3);
+            this.pnlPlayerControls.Controls.Add(this.btnPausePlay);
+            this.pnlPlayerControls.Controls.Add(this.btnNext);
             this.pnlPlayerControls.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlPlayerControls.Location = new System.Drawing.Point(0, 0);
             this.pnlPlayerControls.Name = "pnlPlayerControls";
             this.pnlPlayerControls.Size = new System.Drawing.Size(268, 48);
             this.pnlPlayerControls.TabIndex = 4;
             // 
-            // button1
+            // btnPrev
             // 
-            this.button1.Location = new System.Drawing.Point(7, 7);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(32, 32);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "<<";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnPrev.Location = new System.Drawing.Point(7, 7);
+            this.btnPrev.Name = "btnPrev";
+            this.btnPrev.Size = new System.Drawing.Size(32, 32);
+            this.btnPrev.TabIndex = 0;
+            this.btnPrev.Text = "<<";
+            this.btnPrev.UseVisualStyleBackColor = true;
+            this.btnPrev.Click += new System.EventHandler(this.btnPrev_Click);
             // 
             // panel2
             // 
@@ -559,59 +537,92 @@
             this.lblVol.TabIndex = 2;
             this.lblVol.Text = "100%";
             // 
-            // button2
+            // btnPausePlay
             // 
-            this.button2.Location = new System.Drawing.Point(45, 7);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(32, 32);
-            this.button2.TabIndex = 0;
-            this.button2.Text = "|>";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnPausePlay.Location = new System.Drawing.Point(45, 7);
+            this.btnPausePlay.Name = "btnPausePlay";
+            this.btnPausePlay.Size = new System.Drawing.Size(32, 32);
+            this.btnPausePlay.TabIndex = 0;
+            this.btnPausePlay.Text = "|>";
+            this.btnPausePlay.UseVisualStyleBackColor = true;
+            this.btnPausePlay.Click += new System.EventHandler(this.btnPlayPause_Click);
             // 
-            // button3
+            // btnNext
             // 
-            this.button3.Location = new System.Drawing.Point(83, 7);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(32, 32);
-            this.button3.TabIndex = 0;
-            this.button3.Text = ">>";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnNext.Location = new System.Drawing.Point(83, 7);
+            this.btnNext.Name = "btnNext";
+            this.btnNext.Size = new System.Drawing.Size(32, 32);
+            this.btnNext.TabIndex = 0;
+            this.btnNext.Text = ">>";
+            this.btnNext.UseVisualStyleBackColor = true;
+            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
-            // resetToolStripMenuItem
+            // fileList
             // 
-            this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.resetToolStripMenuItem.Text = "Reset";
-            this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
+            this.fileList.AllowColumnReorder = true;
+            this.fileList.AllowDrop = true;
+            this.fileList.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.fileList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader6,
+            this.columnHeader7,
+            this.columnHeader8,
+            this.columnHeader9,
+            this.columnHeader10});
+            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileList.FullRowSelect = true;
+            this.fileList.HideSelection = false;
+            this.fileList.LabelWrap = false;
+            this.fileList.Location = new System.Drawing.Point(0, 0);
+            this.fileList.Name = "fileList";
+            this.fileList.PlayingID = 0;
+            this.fileList.Size = new System.Drawing.Size(678, 240);
+            this.fileList.TabIndex = 1;
+            this.fileList.UseCompatibleStateImageBehavior = false;
+            this.fileList.View = System.Windows.Forms.View.Details;
+            this.fileList.SelectedIndexChanged += new System.EventHandler(this.fileList_SelectedIndexChanged);
+            this.fileList.DragDrop += new System.Windows.Forms.DragEventHandler(this.fileList_DragDrop);
+            this.fileList.DragEnter += new System.Windows.Forms.DragEventHandler(this.fileList_DragEnter);
+            this.fileList.DoubleClick += new System.EventHandler(this.fileList_DoubleClick);
             // 
-            // toolStripMenuItem3
+            // columnHeader6
             // 
-            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem3.Text = "+0.05";
-            this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
+            this.columnHeader6.Text = "#";
+            this.columnHeader6.Width = 34;
             // 
-            // toolStripMenuItem4
+            // columnHeader7
             // 
-            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem4.Text = "+0.2";
-            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            this.columnHeader7.Text = "Title";
+            this.columnHeader7.Width = 232;
             // 
-            // toolStripMenuItem5
+            // columnHeader8
             // 
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem5.Text = "-0.05";
-            this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
+            this.columnHeader8.Text = "Duration";
+            this.columnHeader8.Width = 54;
             // 
-            // toolStripMenuItem6
+            // columnHeader9
             // 
-            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem6.Text = "-0.2";
-            this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
+            this.columnHeader9.Text = "Book";
+            this.columnHeader9.Width = 220;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "Location";
+            this.columnHeader10.Width = 292;
+            // 
+            // scrubber1
+            // 
+            this.scrubber1.CurrentTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber1.CurrentTotalTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scrubber1.FileStartTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber1.FileTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber1.Location = new System.Drawing.Point(268, 0);
+            this.scrubber1.Name = "scrubber1";
+            this.scrubber1.Size = new System.Drawing.Size(662, 48);
+            this.scrubber1.TabIndex = 5;
+            this.scrubber1.TotalTime = System.TimeSpan.Parse("00:00:00");
+            this.scrubber1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseDown);
+            this.scrubber1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.scrubber1_MouseUp);
             // 
             // Form1
             // 
@@ -625,6 +636,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "ABPlayer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -663,16 +675,16 @@
         private System.Windows.Forms.ToolStripMenuItem noHelpToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PictureBox pBoxArt;
-        private ListView2 fileList;
+        private ABListView fileList;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ColumnHeader columnHeader9;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnNext;
+        private System.Windows.Forms.Button btnPausePlay;
+        private System.Windows.Forms.Button btnPrev;
         private System.Windows.Forms.TrackBar tBarVol;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label lblVol;

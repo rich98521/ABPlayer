@@ -6,32 +6,71 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel;
 using Un4seen.Bass;
+using System.Runtime.InteropServices;
+using Un4seen.Bass.AddOn.Fx;
+using Un4seen.Bass.AddOn.Mix;
 
 namespace ABPlayer
 {
     public delegate void AudioPlayingEventHandler(TimeSpan newTime);
     public delegate void AudioCompletedEventHandler();
     static class AudioPlayer
-    {//fileended event
+    {
         public static event AudioPlayingEventHandler AudioPlaying;
         public static event AudioCompletedEventHandler AudioCompleted;
-        public static string CurrentFile { get; private set; } = "";
-        public static bool Playing { get; private set; }
-        public static float Volume { get; set; }
-        public static float Speed { get; set; }
+        static bool playing;
+        static bool fileLoaded;
+        static float volume = 1;
+        static float speed = 1;
+        static bool mono;
         static CancellationTokenSource cancelToken = new CancellationTokenSource();
         static ManualResetEvent mre = new ManualResetEvent(false);
-        static int streamHandle;
+        static int baseStreamHandle, mixStreamHandle, streamHandle;
+        static SYNCPROC syncProc;
+        static Task updateTask;
+        //static DSPPROC dspProc;
 
-        public static void PlayPause(string file)
+        static AudioPlayer()
         {
-            if (!Playing)
-                PlayFile(file);
-            else
+            updateTask = new Task(UpdateTime, cancelToken.Token, TaskCreationOptions.LongRunning);
+            updateTask.Start();
+        }
+
+        public static float Volume
+        {
+            get { return volume; }
+            set { volume = value; Bass.BASS_ChannelSetAttribute(streamHandle, BASSAttribute.BASS_ATTRIB_VOL, value); }
+        }
+
+        public static float Speed
+        {
+            get { return speed; }
+            set { speed = value; Bass.BASS_ChannelSetAttribute(streamHandle, BASSAttribute.BASS_ATTRIB_TEMPO, (value - 1) * 100); }
+        }
+
+        public static bool Mono
+        {
+            get { return mono; }
+            set
             {
-                //playpause
-                Playing = !Playing;
+                mono = value;
+                float[,] matrix = new float[,] { { 1, 0 }, { 0, 1 } };
+                if (value)
+                    matrix = new float[,] { { 1, 1 }, { 1, 1 } };
+                BassMix.BASS_Mixer_ChannelSetMatrix(baseStreamHandle, matrix);
             }
+        }
+
+        public static bool Playing
+        {
+            get { return playing; }
+            private set { if (value) mre.Set(); playing = value; }
+        }
+
+        public static bool FileLoaded
+        {
+            get { return fileLoaded; }
+            private set { if (!value) Playing = false; fileLoaded = value; }
         }
 
         private static void RaiseEventOnUIThread(Delegate theEvent, params object[] args)
@@ -39,71 +78,112 @@ namespace ABPlayer
             foreach (Delegate d in theEvent.GetInvocationList())
             {
                 ISynchronizeInvoke syncer = d.Target as ISynchronizeInvoke;
-                if (syncer == null)
+                try
                 {
-                    d.DynamicInvoke(args);
+                    if (syncer == null)
+                        d.DynamicInvoke(args);
+                    else
+                        syncer.BeginInvoke(d, args);
                 }
-                else
-                {
-                    syncer.BeginInvoke(d, args);
-                }
+                catch { }
             }
         }
 
-        public static void Pause()
+        public static void Play(string file, bool loadOnly)
         {
-            Playing = false;
+            Stop();
+            baseStreamHandle = Bass.BASS_StreamCreateFile(file, 0, 0, BASSFlag.BASS_STREAM_DECODE);
+            BASS_CHANNELINFO info = Bass.BASS_ChannelGetInfo(baseStreamHandle);
+            mixStreamHandle = BassMix.BASS_Mixer_StreamCreate(info.freq, info.chans, BASSFlag.BASS_STREAM_DECODE);
+            BassMix.BASS_Mixer_StreamAddChannel(mixStreamHandle, baseStreamHandle, BASSFlag.BASS_MIXER_MATRIX);
+            streamHandle = BassFx.BASS_FX_TempoCreate(mixStreamHandle, BASSFlag.BASS_FX_FREESOURCE);
+            Mono = mono;
+            Speed = speed;
+            if (!loadOnly)
+                Bass.BASS_ChannelPlay(streamHandle, false);
+            BASSError er = Bass.BASS_ErrorGetCode();
+            syncProc = new SYNCPROC(AudioEnded);
+            Bass.BASS_ChannelSetSync(streamHandle, BASSSync.BASS_SYNC_END, 0, syncProc, IntPtr.Zero);
+            Playing = !loadOnly;
+            FileLoaded = true;
         }
 
         public static void Continue()
         {
-            Playing = true;
-            mre.Set();
-        }
-
-        public static void PlayFile(string file)
-        {
-            //playfile
-            Playing = true;
-            CurrentFile = file;
-
-            Task playTask = new Task(PlayTask, cancelToken.Token, TaskCreationOptions.LongRunning);
-            playTask.Start();
-        }
-
-        public static void SetPlayed(TimeSpan t)
-        {
-            //Bass.BASS_ChannelSetPosition(streamHandle, t.TotalSeconds);
-            Bass.BASS_ChannelSetPosition(streamHandle, (long)(Bass.BASS_ChannelSeconds2Bytes(streamHandle, 1) * t.TotalSeconds), BASSMode.BASS_POS_INEXACT | BASSMode.BASS_POS_BYTES);
-        }
-
-        private static void AudioEnded(int handle, int channel, int data, IntPtr user)
-        {
-            RaiseEventOnUIThread(AudioCompleted);
-        }
-
-        private static void PlayTask()
-        {
-            streamHandle = Bass.BASS_StreamCreateFile(CurrentFile, 0, 0, 0);
             Bass.BASS_ChannelPlay(streamHandle, false);
-            Bass.BASS_ChannelSetSync(streamHandle, BASSSync.BASS_SYNC_END, 0, new SYNCPROC(AudioEnded), IntPtr.Zero);
+            Playing = true;
+        }
+
+        public static void Pause()
+        {
+            Bass.BASS_ChannelPause(streamHandle);
+            Playing = false;
+        }
+
+        public static void Stop()
+        {
+            Bass.BASS_ChannelStop(streamHandle);
+            Bass.BASS_StreamFree(streamHandle);
+            Playing = false;
+            FileLoaded = false;
+        }
+
+        public static void PlayPause(string file)
+        {
+            if (FileLoaded)
+                if (Playing)
+                    Pause();
+                else
+                    Continue();
+            else
+                Play(file, false);
+        }
+
+        private static void UpdateTime()
+        {
             while (true)
             {
                 cancelToken.Token.WaitHandle.WaitOne(100);
+                if (cancelToken.IsCancellationRequested)
+                    break;
                 if (!Playing)
                 {
-                    Bass.BASS_ChannelPause(streamHandle);
                     mre.WaitOne();
                     mre.Reset();
-                    Bass.BASS_ChannelPlay(streamHandle, false);
                 }
 
-                TimeSpan playedSoFar = new TimeSpan(0, 0, 0, 0, 
-                    (int)(Bass.BASS_ChannelBytes2Seconds(streamHandle, Bass.BASS_ChannelGetPosition(streamHandle, BASSMode.BASS_POS_BYTES)) * 1000));
+                TimeSpan playedSoFar = new TimeSpan(0, 0, 0, 0,
+                    (int)(Bass.BASS_ChannelBytes2Seconds(mixStreamHandle, Bass.BASS_ChannelGetPosition(baseStreamHandle, BASSMode.BASS_POS_BYTES)) * 1000));
 
                 RaiseEventOnUIThread(AudioPlaying, playedSoFar);
             }
         }
+
+        public static void JumpTo(TimeSpan t)
+        {
+            BassMix.BASS_Mixer_ChannelSetPosition(baseStreamHandle, (long)(Bass.BASS_ChannelSeconds2Bytes(baseStreamHandle, 1) * t.TotalSeconds), BASSMode.BASS_POS_BYTES);
+        }
+
+        private static void AudioEnded(int handle, int channel, int data, IntPtr user)
+        {
+            FileLoaded = false;
+            RaiseEventOnUIThread(AudioCompleted);
+        }
+
+        //private static void DSP(int handle, int channel, IntPtr buffer, int length, IntPtr user)
+        //{
+        //    unsafe
+        //    {
+        //        float* ptr = (float*)buffer.ToPointer();
+        //        for (int i = 0; i < length; i+=channelCount)
+        //        {
+        //            for(int i2=0;i2<channelCount;i2++)
+        //            {
+        //                ptr[i + i2] *= Volume;
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
 
